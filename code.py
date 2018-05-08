@@ -1,5 +1,5 @@
 def log_progress(sequence, every=None, size=None, name=''):
-    from ipywidgets import IntProgress, HTML, VBox, HBox
+    from ipywidgets import IntProgress, HTML, HBox
     from IPython.display import display
 
     is_iterator = False
