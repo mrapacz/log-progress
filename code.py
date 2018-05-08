@@ -28,8 +28,8 @@ def log_progress(sequence, every=None, size=None, name=''):
 
     index = 0
     try:
-        for index, record in enumerate(sequence, 1):
-            if index == 1 or index % every == 0:
+        for index, record in enumerate(sequence, 0):
+            if index % every == 0:
                 if is_iterator:
                     label.value = '{name} {index} / ?'.format(
                         name=name,
@@ -48,6 +48,7 @@ def log_progress(sequence, every=None, size=None, name=''):
         raise
     else:
         progress.bar_style = 'success'
+        index += 1
         progress.value = index
         label.value = "{name} {index} / {size}".format(
             name=name,
