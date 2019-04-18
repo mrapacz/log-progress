@@ -3,6 +3,9 @@ def log_progress(sequence, every=None, size=None, with_time=False, name=''):
     from IPython.display import display
     from datetime import datetime
 
+    def format_time(time_value):
+        return str(time_value).split(".")[0]
+
     is_iterator = False
     if size is None:
         try:
@@ -24,12 +27,12 @@ def log_progress(sequence, every=None, size=None, with_time=False, name=''):
         with_time = False
     else:
         progress = IntProgress(min=0, max=size, value=0)
-        time_started = datetime.now()
 
     label = HTML()
     box = HBox(children=[label, progress])
     display(box)
 
+    time_started = datetime.now()
     index = 0
     try:
         for index, record in enumerate(sequence, 0):
@@ -42,8 +45,8 @@ def log_progress(sequence, every=None, size=None, with_time=False, name=''):
                 else:
                     if with_time:
                         time_elapsed = datetime.now() - time_started
-                        time_left = str(size / index * time_elapsed - time_elapsed).split(".")[0]
-                        time_status = "| ETA: {}".format(time_left)
+                        time_left = size / index * time_elapsed - time_elapsed
+                        time_status = "| ETA: {}".format(format_time(time_left))
                     else:
                         time_status = ""
 
@@ -63,8 +66,9 @@ def log_progress(sequence, every=None, size=None, with_time=False, name=''):
         progress.bar_style = 'success'
         index += 1
         progress.value = index
-        label.value = "{name} {index} / {size}".format(
+        label.value = "{name} {index} / {size} | Time elapsed {time_elapsed}".format(
             name=name,
             index=str(index or '?'),
-            size=size
+            size=size,
+            time_elapsed=format_time(time_started - datetime.now()),
         )
