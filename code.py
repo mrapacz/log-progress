@@ -1,6 +1,7 @@
-def log_progress(sequence, every=None, size=None, name=''):
+def log_progress(sequence, every=None, size=None, with_time=False, name=''):
     from ipywidgets import IntProgress, HTML, HBox
     from IPython.display import display
+    from datetime import datetime
 
     is_iterator = False
     if size is None:
@@ -13,15 +14,18 @@ def log_progress(sequence, every=None, size=None, name=''):
             if size <= 200:
                 every = 1
             else:
-                every = int(size / 200)     # every 0.5%
+                every = int(size / 200)  # every 0.5%
     else:
         assert every is not None, 'sequence is iterator, set every'
 
     if is_iterator:
         progress = IntProgress(min=0, max=1, value=1)
         progress.bar_style = 'info'
+        with_time = False
     else:
         progress = IntProgress(min=0, max=size, value=0)
+        time_started = datetime.now()
+
     label = HTML()
     box = HBox(children=[label, progress])
     display(box)
@@ -36,12 +40,21 @@ def log_progress(sequence, every=None, size=None, name=''):
                         index=index
                     )
                 else:
+                    if with_time:
+                        time_elapsed = datetime.now() - time_started
+                        time_left = str(size / index * time_elapsed - time_elapsed).split(".")[0]
+                        time_status = "| ETA: {}".format(time_left)
+                    else:
+                        time_status = ""
+
                     progress.value = index
-                    label.value = u'{name} {index} / {size}'.format(
+                    label.value = u'{name}: {index} / {size} {time}'.format(
                         name=name,
                         index=index,
-                        size=size
+                        size=size,
+                        time=time_status
                     )
+
             yield record
     except:
         progress.bar_style = 'danger'
